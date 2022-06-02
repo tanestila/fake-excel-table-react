@@ -1,4 +1,5 @@
 import { CaretUpOutlined } from "@ant-design/icons";
+import { useWhyDidYouUpdate } from "ahooks";
 import { Button, Dropdown } from "antd";
 import React, { useEffect, useRef } from "react";
 import { Resizable } from "react-resizable";
@@ -143,6 +144,15 @@ export default function VTHeader({
 }: any) {
   const tHeader: any = useRef(null);
   // console.log(scrollLeft);
+
+  useWhyDidYouUpdate("header", {
+    columns,
+    flatColumns,
+    scrollLeft,
+    width,
+    widths,
+    onResizeCol,
+  });
 
   useEffect(() => {
     if (tHeader.current) {

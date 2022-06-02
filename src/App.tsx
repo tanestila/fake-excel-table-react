@@ -5,6 +5,7 @@ import React from "react";
 import VTable from "./components/VTable";
 import VTHeader from "./components/VTHeader";
 import CustomTable from "./main/CustomTable";
+import CustomTableNew from "./main/CustomTableNew";
 
 function App() {
   return (
@@ -23,7 +24,8 @@ function App() {
           x: "100vw",
         }}
       /> */}
-      <CustomTable />
+      {/* <CustomTable /> */}
+      <CustomTableNew />
     </div>
   );
 }

@@ -8,23 +8,17 @@ import { useEffect, useRef, useState } from "react";
 import VTHeader from "../components/VTHeader";
 import { Checkbox } from "antd";
 
-const columns = [
+const columnsf = [
   {
-    title: "",
-    key: "selectAll",
-    width: 50,
-    fixed: true,
-    render: () => <Checkbox />,
-  },
-  {
-    title: "A",
+    titleText: "A",
     dataIndex: "key",
+    title: <div>Aasas</div>,
     width: 150,
     fixed: true,
   },
   {
     title: "A1",
-    dataIndex: "key",
+    dataIndex: "col1",
     width: 100,
     fixed: true,
   },
@@ -33,12 +27,12 @@ const columns = [
     children: [
       {
         title: "B1",
-        dataIndex: "key",
+        dataIndex: "col1",
         width: 50,
       },
       {
         title: "B2",
-        dataIndex: "key",
+        dataIndex: "col2",
         width: 80,
       },
     ],
@@ -81,6 +75,8 @@ const data = Array.from(
   },
   (_, key) => ({
     key,
+    col1: "col1" + key,
+    col2: "col2" + key,
   })
 );
 
@@ -89,9 +85,36 @@ export default function CustomTable() {
   const [flatColumns, setFlatColumns] = useState<any>([]);
   const [fixedColumns, setFixedColumns] = useState<any>([]);
   const [fixedWidth, setFixedWidth] = useState<number>(0);
-
+  const [selectedKeys, setSelectedKeys] = useState<any[]>([]);
   const bGridRef = useRef<any>(null);
   const lGridRef = useRef<any>(null);
+  const [columns, setColumns] = useState<any>([
+    {
+      title: "",
+      key: "selectAll",
+      width: 50,
+      fixed: true,
+      checkbox: true,
+    },
+    ...columnsf,
+  ]);
+
+  const onCheckboxChange = ({ record, key }: any) => {
+    let temp = [...selectedKeys];
+    console.log(key);
+    console.log(temp.includes(key));
+    if (temp.includes(key)) {
+      temp = temp.filter((k) => k !== key);
+    } else {
+      temp.push(key);
+    }
+    setSelectedKeys(temp);
+  };
+
+  useEffect(() => {
+    console.log(selectedKeys);
+    lGridRef.current?.forceUpdate();
+  }, [selectedKeys]);
 
   const _renderLeftHeaderCell = ({
     columnIndex,
@@ -121,17 +144,28 @@ export default function CustomTable() {
         : "oddRow";
     const classNames = rowClass + " " + "cell";
 
-    if (flatColumns[columnIndex].render) {
+    if (flatColumns[columnIndex].checkbox) {
       return (
         <div className={classNames} key={key} style={style}>
-          {flatColumns[columnIndex].render()}
+          <Checkbox
+            onChange={() =>
+              onCheckboxChange({
+                record: data[rowIndex],
+                key: data[rowIndex].key,
+              })
+            }
+            checked={selectedKeys.includes(data[rowIndex].key)}
+          />
         </div>
       );
     }
-
+    const colDataKey = flatColumns[columnIndex].dataIndex;
+    const record = data[rowIndex];
+    console.log(record);
+    console.log(colDataKey);
     return (
       <div className={classNames} key={key} style={style}>
-        {`R${rowIndex}, C${columnIndex}`}
+        {record[colDataKey as keyof typeof record]}
       </div>
     );
   };
@@ -161,11 +195,11 @@ export default function CustomTable() {
       }
     };
 
-    getFlatColumns(columns);
+    getFlatColumns([...columns]);
 
     setFixedColumns(tempFlatColumns.filter((col) => col.fixed));
 
-    setFlatColumns(tempFlatColumns);
+    setFlatColumns([...tempFlatColumns]);
     setWidths(tempWidths);
   }, []);
 
